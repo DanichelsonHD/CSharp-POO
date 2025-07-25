@@ -3,7 +3,7 @@ namespace Namespace
     class Secao6
     {
         static Room[] rooms = new Room[10];
-        static void Main(string[] args)
+        static void Main1(string[] args)
         {
             Console.Write("Quantos quartos serão alugados? ");
             int n = int.Parse(Console.ReadLine());

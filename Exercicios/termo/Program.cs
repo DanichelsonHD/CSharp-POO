@@ -7,11 +7,7 @@ using System.Text.RegularExpressions;
 namespace Termo
 {
     class Game
-    {
-        static readonly string PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-        @"..\..\..\Exercicios\termo\palavras.txt");
-        
-
+    {     
         static void Main(string[] args)
         {
             StartGame();
@@ -19,7 +15,7 @@ namespace Termo
 
         static void StartGame()
         {
-            string choosenWord = PickRandomWord();
+            (string withAccent, string choosenWord) = PickRandomWord();
             int tries = 1;
             int chances = 6;
             bool won = false;
@@ -37,7 +33,7 @@ namespace Termo
                 }
                 else
                 {
-                    Console.WriteLine($"\n\nVocê perdeu! A palavra era: {choosenWord}");
+                    Console.WriteLine($"\n\nVocê perdeu! A palavra era: {withAccent}");
                     break;
                 }
             }
@@ -47,11 +43,21 @@ namespace Termo
             else Console.WriteLine("Obrigado por jogar!");
         }
 
-        static string PickRandomWord()
+        static (string worsdWithAccent, string wordsWithoutAccent) PickRandomWord()
         {
-            string[] palavras = File.ReadAllLines(PATH);
+            string pathWithAccent = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\Exercicios\termo\palavras_com_acento.txt");
+            string pathWithoutAccent = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\Exercicios\termo\palavras_sem_acentos.txt");
+
+            string[] wordsWithAccent = File.ReadAllLines(pathWithAccent);
+            string[] wordsWithoutAccent = File.ReadAllLines(pathWithoutAccent);
+
             Random rnd = new Random();
-            return palavras[rnd.Next(palavras.Length)].ToUpper(CultureInfo.InvariantCulture);
+            int index = rnd.Next(wordsWithAccent.Length);
+
+            return (
+                wordsWithAccent[index].ToUpper(CultureInfo.InvariantCulture),
+                wordsWithoutAccent[index].ToUpper(CultureInfo.InvariantCulture)
+            );
         }
 
         static string GetInput()
@@ -90,7 +96,7 @@ namespace Termo
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    letters[i] = ' ';
+                    letters[i] = '_';
                 }
                 Console.Write(input[i]);
             }

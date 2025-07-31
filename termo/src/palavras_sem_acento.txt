@@ -894,4 +894,3 @@ vosso
 votar
 votos
 vozes
-white

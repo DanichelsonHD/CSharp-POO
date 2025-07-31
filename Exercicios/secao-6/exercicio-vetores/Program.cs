@@ -1,6 +1,6 @@
-namespace Namespace
+namespace Secao6
 {
-    class Secao6
+    class ExVetores
     {
         static Room[] rooms = new Room[10];
         static void Main1(string[] args)

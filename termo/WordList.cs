@@ -38,8 +38,8 @@ namespace Termo
 
         public static (string wordsWithAccent, string wordsWithoutAccent) PickRandomWord()
         {
-            Random rnd = new Random();
-            int index = rnd.Next(wordsWithAccent.Length);
+            Random random = new Random();
+            int index = random.Next(wordsWithAccent.Length);
 
             return (
                 wordsWithAccent[index].ToUpper(CultureInfo.InvariantCulture),

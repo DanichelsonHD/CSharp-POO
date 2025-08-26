@@ -4,7 +4,7 @@ namespace Secao8.exercicio_01
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main1(string[] args)
         {
             string departmentName = GetInput("Enter department's name: ");
             Console.WriteLine("Enter worker data:");

@@ -2,7 +2,7 @@ namespace Secao11.exercicio_01
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main1(string[] args)
         {
             try
             {

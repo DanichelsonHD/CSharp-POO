@@ -14,5 +14,7 @@ namespace Secao17.board
             this.board = board;
             moveQuantity = 0;
         }
+
+        public void AugmentMoveQuantity() => moveQuantity++;
     }
 }

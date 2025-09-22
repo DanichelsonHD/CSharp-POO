@@ -7,14 +7,20 @@ namespace Secao17.ChessGame
     {
         static void Main(string[] args)
         {
-            Board board = new Board(8, 8);
-            board.PutPiece(new Rook(board, Color.Black), new Position(0, 0));
-            board.PutPiece(new Rook(board, Color.Black), new Position(1, 3));
-            board.PutPiece(new King(board, Color.Black), new Position(2, 4));
+            ChessMatch chessMatch = new ChessMatch();
 
-            Screen.PrintBoard(board);
+            while (!chessMatch.ended)
+            {
+                Console.Clear();
+                Screen.PrintBoard(chessMatch.board);
 
-            Console.WriteLine();
+                Console.Write($"\nOrigin: ");
+                Position origin = Screen.ReadChessPosition().ToPosition();
+                Console.Write($"Destiny: ");
+                Position destiny = Screen.ReadChessPosition().ToPosition();
+
+                chessMatch.PlayMove(origin, destiny);
+            }
         }
     }
 }

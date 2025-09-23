@@ -40,7 +40,7 @@ namespace Secao17.chess
             board.PlacePiece(new Rook(board, Color.White), new ChessPosition("h1").ToPosition());
 
             //White Pawns
-            board.PlacePiece(new Pawn(board, Color.White), new ChessPosition("a2").ToPosition());
+            //board.PlacePiece(new Pawn(board, Color.White), new ChessPosition("a2").ToPosition());
             board.PlacePiece(new Pawn(board, Color.White), new ChessPosition("b2").ToPosition());
             board.PlacePiece(new Pawn(board, Color.White), new ChessPosition("c2").ToPosition());
             board.PlacePiece(new Pawn(board, Color.White), new ChessPosition("d2").ToPosition());

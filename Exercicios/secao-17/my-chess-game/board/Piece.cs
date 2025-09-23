@@ -1,6 +1,6 @@
 namespace Secao17.board
 {
-    class Piece
+    abstract class Piece
     {
         public Position position { get; set; }
         public Color color { get; protected set; }
@@ -14,7 +14,34 @@ namespace Secao17.board
             this.board = board;
             moveQuantity = 0;
         }
+        protected bool CanMove(Position position)
+        {
+            if (!board.IsPositionValid(position)) return false;
+            Piece piece = board.Piece(position);
+            return piece == null || piece.color != color;
+        }
+        protected bool OneMoveAtTime(int lineModifier, int columnModifier, Position position)
+        {
+            if (!board.IsPositionValid(new Position(this.position.line + lineModifier, this.position.column + columnModifier))) return false;
+            position.DefineValues(this.position.line + lineModifier, this.position.column + columnModifier);
+            if (board.IsPositionValid(position) && CanMove(position)) return true;
+            return false;
+        }
+        protected bool[,] SequentialMoves(int lineModifier, int columnModifier, Position position, bool[,] matrix)
+        {
+            position.DefineValues(this.position.line + lineModifier, this.position.column + columnModifier);
+            while (board.IsPositionValid(position) && CanMove(position))
+            {
+                matrix[position.line, position.column] = true;
+                Piece piece = board.Piece(position);
+                if (piece != null && piece.color != color) break;
 
+                position.line += lineModifier;
+                position.column += columnModifier;
+            }
+            return matrix;
+        }
+        public abstract bool[,] ValidMoves();
         public void AugmentMoveQuantity() => moveQuantity++;
     }
 }

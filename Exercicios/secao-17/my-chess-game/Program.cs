@@ -16,7 +16,13 @@ namespace Secao17.ChessGame
 
                 Console.Write($"\nOrigin: ");
                 Position origin = Screen.ReadChessPosition().ToPosition();
-                Console.Write($"Destiny: ");
+
+                bool[,] possibleMoves = chessMatch.board.Piece(origin).ValidMoves();
+
+                Console.Clear();
+                Screen.PrintBoard(chessMatch.board, possibleMoves);
+
+                Console.Write($"\nDestiny: ");
                 Position destiny = Screen.ReadChessPosition().ToPosition();
 
                 chessMatch.PlayMove(origin, destiny);

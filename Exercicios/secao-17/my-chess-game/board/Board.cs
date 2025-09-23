@@ -37,7 +37,7 @@ namespace Secao17.board
 
         public bool IsPositionValid(Position position)
         {
-            if (position.line > lines || position.line < 0 || position.column > columns || position.column < 0) return false;
+            if (position.line >= lines || position.line < 0 || position.column >= columns || position.column < 0) return false;
             return true;
         }
         public void ValidatePosition(Position position)

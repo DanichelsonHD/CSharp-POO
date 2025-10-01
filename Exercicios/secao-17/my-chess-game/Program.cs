@@ -11,21 +11,31 @@ namespace Secao17.ChessGame
 
             while (!chessMatch.ended)
             {
-                Console.Clear();
-                Screen.PrintBoard(chessMatch.board);
+                try
+                {
+                    Console.Clear();
+                    Screen.PrintMatch(chessMatch);
 
-                Console.Write($"\nOrigin: ");
-                Position origin = Screen.ReadChessPosition().ToPosition();
+                    Console.Write($"\nOrigin: ");
+                    Position origin = Screen.ReadChessPosition().ToPosition();
+                    chessMatch.ValidateOriginPosition(origin);
 
-                bool[,] possibleMoves = chessMatch.board.Piece(origin).ValidMoves();
+                    bool[,] possibleMoves = chessMatch.board.Piece(origin).ValidMoves();
 
-                Console.Clear();
-                Screen.PrintBoard(chessMatch.board, possibleMoves);
+                    Console.Clear();
+                    Screen.PrintMatch(chessMatch);
 
-                Console.Write($"\nDestiny: ");
-                Position destiny = Screen.ReadChessPosition().ToPosition();
+                    Console.Write($"\nDestiny: ");
+                    Position destiny = Screen.ReadChessPosition().ToPosition();
+                    chessMatch.ValidateDestinyPosition(origin, destiny);
 
-                chessMatch.PlayMove(origin, destiny);
+                    chessMatch.PlayMove(origin, destiny);
+                }
+                catch (BoardException e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.ReadLine();
+                }
             }
         }
     }

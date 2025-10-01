@@ -41,7 +41,19 @@ namespace Secao17.board
             }
             return matrix;
         }
-        public abstract bool[,] ValidMoves();
         public void AugmentMoveQuantity() => moveQuantity++;
+        public bool existValidMoves()
+        {
+            bool[,] mat = ValidMoves();
+            for (int i = 0; i < board.lines; i++)
+                for (int j = 0; j < board.columns; j++)
+                    if (mat[i, j]) return true;
+            return false;
+        }
+        public bool canMoveTo(Position position)
+        {
+            return ValidMoves()[position.line, position.column];
+        }
+        public abstract bool[,] ValidMoves();
     }
 }

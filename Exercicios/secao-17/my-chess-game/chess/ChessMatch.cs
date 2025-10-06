@@ -5,58 +5,123 @@ namespace Secao17.chess
     class ChessMatch
     {
         public Board board { get; private set; }
-        public int turn { get; private set; }
-        public Color currentPlayer { get; private set; }
-        public bool ended { get; private set; }
+        public int Turn { get; private set; }
+        public Color CurrentPlayer { get; private set; }
+        public bool Check { get; private set; }
+        public bool Ended { get; private set; }
         private HashSet<Piece> pieces;
         private HashSet<Piece> captured;
 
         public ChessMatch()
         {
             board = new Board(8, 8);
-            turn = 1;
-            currentPlayer = Color.White;
-            ended = false;
+            Turn = 1;
+            CurrentPlayer = Color.White;
+            Ended = false;
             pieces = new HashSet<Piece>();
             captured = new HashSet<Piece>();
 
             PlaceInitialPieces();
         }
 
-        public void ExecuteMove(Position origin, Position destiny)
+        public Piece ExecuteMove(Position origin, Position destiny)
         {
             Piece piece = board.RemovePiece(origin);
             piece.AugmentMoveQuantity();
             Piece capturedPiece = board.RemovePiece(destiny);
             board.PlacePiece(piece, destiny);
             if (capturedPiece != null) captured.Add(capturedPiece);
+            return capturedPiece;
+        }
+        public void UndoMove(Position origin, Position destiny, Piece capturedPiece)
+        {
+            Piece piece = board.RemovePiece(destiny);
+            piece.DecreaseMoveQuantity();
+            if (capturedPiece != null)
+            {
+                board.PlacePiece(capturedPiece, destiny);
+                captured.Remove(capturedPiece);
+            }
+            board.PlacePiece(piece, origin);
         }
         public void PlayMove(Position origin, Position destiny)
         {
-            ExecuteMove(origin, destiny);
-            turn++;
-            changePlayer();
+            Piece capturedPiece = ExecuteMove(origin, destiny);
+
+            if (IsInCheck(CurrentPlayer))
+            {
+                UndoMove(origin, destiny, capturedPiece);
+                throw new BoardException("You can't put yourself in check");
+            }
+            if (IsInCheck(adversary(CurrentPlayer))) Check = true;
+            else Check = false;
+
+            if (TestCheckmate(adversary(CurrentPlayer))) {  Ended = true; Console.WriteLine($"Ended"); }
+            else
+            {
+                Turn++;
+                changePlayer();
+            }
         }
         public void ValidateOriginPosition(Position origin)
         {
             if (board.Piece(origin) == null) throw new BoardException("There isn't a piece in this position");
-            if (currentPlayer != board.Piece(origin).color) throw new BoardException("This isn't your piece");
+            if (CurrentPlayer != board.Piece(origin).color) throw new BoardException("This isn't your piece");
             if (!board.Piece(origin).existValidMoves()) throw new BoardException("No possible moves for this piece");
         }
         public void ValidateDestinyPosition(Position origin, Position destiny)
         {
-            if (!board.Piece(origin).canMoveTo(destiny)) throw new BoardException("Invalid Position");
+            if (!board.Piece(origin).possibleMove(destiny)) throw new BoardException("Invalid Position");
         }
         private void changePlayer()
         {
-            if (currentPlayer == Color.White) currentPlayer = Color.Black;
-            else currentPlayer = Color.White;
+            if (CurrentPlayer == Color.White) CurrentPlayer = Color.Black;
+            else CurrentPlayer = Color.White;
         }
-        public HashSet<Piece> inGamePieces(Color color)
-            => pieces.Where(piece => piece.color == color).Except(capturedPieces(color)).ToHashSet();
-        public HashSet<Piece> capturedPieces(Color color)
+        public HashSet<Piece> InGamePieces(Color color)
+            => pieces.Where(piece => piece.color == color).Except(CapturedPieces(color)).ToHashSet();
+        public HashSet<Piece> CapturedPieces(Color color)
             => captured.Where(piece => piece.color == color).ToHashSet();
-        public void placeNewPiece(string position, Piece piece)
+        private Color adversary(Color color) => color == Color.White ? Color.Black : Color.White;
+        private Piece king(Color color)
+        {
+            foreach (Piece piece in InGamePieces(color)) if (piece is King) return piece;
+            return null;
+        }
+        public bool IsInCheck(Color color)
+        {
+            Piece k = king(color);
+            if (k == null) throw new BoardException($"There is no {color} king");
+
+            foreach (Piece piece in InGamePieces(adversary(color)))
+            {
+                bool[,] matrix = piece.ValidMoves();
+                if (matrix[k.position.line, k.position.column]) return true;
+            }
+            return false;
+        }
+        public bool TestCheckmate(Color color)
+        {
+            if (!IsInCheck(color)) return false;
+            foreach (Piece piece in InGamePieces(color))
+            {
+                bool[,] matrix = piece.ValidMoves();
+                for (int i = 0; i < board.lines; i++)
+                    for (int j = 0; j < board.columns; j++)
+                        if (matrix[i, j])
+                        {
+                            Position origin = piece.position;
+                            Position destiny = new Position(i, j);
+                            Piece capturedPiece = ExecuteMove(origin, destiny);
+                            bool testCheck = IsInCheck(color);
+                            UndoMove(origin, destiny, capturedPiece);
+                            if (!testCheck) return false;
+                        }
+
+            }
+            return true;
+        }
+        public void PlaceNewPiece(string position, Piece piece)
         {
             board.PlacePiece(piece, new ChessPosition(position).ToPosition());
             pieces.Add(piece);
@@ -64,30 +129,30 @@ namespace Secao17.chess
         public void PlaceInitialPieces()
         {
             //White Pieces
-            placeNewPiece("a1", new Rook(board, Color.White));
-            placeNewPiece("b1", new Knight(board, Color.White));
-            placeNewPiece("c1", new Bishop(board, Color.White));
-            placeNewPiece("d1", new Queen(board, Color.White));
-            placeNewPiece("e1", new King(board, Color.White));
-            placeNewPiece("f1", new Bishop(board, Color.White));
-            placeNewPiece("g1", new Knight(board, Color.White));
-            placeNewPiece("h1", new Rook(board, Color.White));
+            PlaceNewPiece("a1", new Rook(board, Color.White));
+            PlaceNewPiece("b1", new Knight(board, Color.White));
+            PlaceNewPiece("c1", new Bishop(board, Color.White));
+            PlaceNewPiece("d1", new Queen(board, Color.White));
+            PlaceNewPiece("e1", new King(board, Color.White));
+            PlaceNewPiece("f1", new Bishop(board, Color.White));
+            PlaceNewPiece("g1", new Knight(board, Color.White));
+            PlaceNewPiece("h1", new Rook(board, Color.White));
 
             //White Pawns
-            for (int i = 0; i < board.columns; i++) placeNewPiece($"{(char)('a' + i)}2", new Pawn(board, Color.White));
+            for (int i = 0; i < board.columns; i++) PlaceNewPiece($"{(char)('a' + i)}2", new Pawn(board, Color.White));
 
             //Black Pieces
-            placeNewPiece("a8", new Rook(board, Color.Black));
-            placeNewPiece("b8", new Knight(board, Color.Black));
-            placeNewPiece("c8", new Bishop(board, Color.Black));
-            placeNewPiece("d8", new Queen(board, Color.Black));
-            placeNewPiece("e8", new King(board, Color.Black));
-            placeNewPiece("f8", new Bishop(board, Color.Black));
-            placeNewPiece("g8", new Knight(board, Color.Black));
-            placeNewPiece("h8", new Rook(board, Color.Black));
+            PlaceNewPiece("a8", new Rook(board, Color.Black));
+            PlaceNewPiece("b8", new Knight(board, Color.Black));
+            PlaceNewPiece("c8", new Bishop(board, Color.Black));
+            PlaceNewPiece("d8", new Queen(board, Color.Black));
+            PlaceNewPiece("e8", new King(board, Color.Black));
+            PlaceNewPiece("f8", new Bishop(board, Color.Black));
+            PlaceNewPiece("g8", new Knight(board, Color.Black));
+            PlaceNewPiece("h8", new Rook(board, Color.Black));
 
             //Black Pawns
-            //for (int i = 0; i < board.columns; i++) placeNewPiece($"{(char)('a' + i)}7", new Pawn(board, Color.Black));
+            for (int i = 0; i < board.columns; i++) PlaceNewPiece($"{(char)('a' + i)}7", new Pawn(board, Color.Black));
         }
     }
 }

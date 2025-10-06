@@ -9,7 +9,7 @@ namespace Secao17.ChessGame
         {
             ChessMatch chessMatch = new ChessMatch();
 
-            while (!chessMatch.ended)
+            while (!chessMatch.Ended)
             {
                 try
                 {
@@ -20,10 +20,9 @@ namespace Secao17.ChessGame
                     Position origin = Screen.ReadChessPosition().ToPosition();
                     chessMatch.ValidateOriginPosition(origin);
 
-                    bool[,] possibleMoves = chessMatch.board.Piece(origin).ValidMoves();
-
                     Console.Clear();
-                    Screen.PrintMatch(chessMatch);
+                    bool[,] possibleMoves = chessMatch.board.Piece(origin).ValidMoves();
+                    Screen.PrintBoard(chessMatch.board, possibleMoves);
 
                     Console.Write($"\nDestiny: ");
                     Position destiny = Screen.ReadChessPosition().ToPosition();
@@ -37,6 +36,8 @@ namespace Secao17.ChessGame
                     Console.ReadLine();
                 }
             }
+            Console.Clear();
+            Screen.PrintMatch(chessMatch);
         }
     }
 }

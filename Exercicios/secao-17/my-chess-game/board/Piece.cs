@@ -42,6 +42,7 @@ namespace Secao17.board
             return matrix;
         }
         public void AugmentMoveQuantity() => moveQuantity++;
+        public void DecreaseMoveQuantity() => moveQuantity--;
         public bool existValidMoves()
         {
             bool[,] mat = ValidMoves();
@@ -50,7 +51,7 @@ namespace Secao17.board
                     if (mat[i, j]) return true;
             return false;
         }
-        public bool canMoveTo(Position position)
+        public bool possibleMove(Position position)
         {
             return ValidMoves()[position.line, position.column];
         }

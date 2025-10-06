@@ -16,39 +16,30 @@ namespace Secao17.chess
                 { 0, -1 }, { -1, -1 }
             };
             Position position = new Position(0, 0);
-            bool isValid;
 
             // Up
-            isValid = OneMoveAtTime(-1, 0, position);
-            matrix[position.line, position.column] = isValid;
+            if (OneMoveAtTime(-1, 0, position)) matrix[position.line, position.column] = true;
 
             // Right Up
-            isValid = OneMoveAtTime(-1, 1, position);
-            matrix[position.line, position.column] = isValid;
+            if (OneMoveAtTime(-1, 1, position)) matrix[position.line, position.column] = true;
 
             // Right
-            isValid = OneMoveAtTime(0, 1, position);
-            matrix[position.line, position.column] = isValid;
+            if (OneMoveAtTime(0, 1, position)) matrix[position.line, position.column] = true;
 
             // Right Down
-            isValid = OneMoveAtTime(1, 1, position);
-            matrix[position.line, position.column] = isValid;
+            if (OneMoveAtTime(1, 1, position)) matrix[position.line, position.column] = true;
 
             // Down
-            isValid = OneMoveAtTime(1, 0, position);
-            matrix[position.line, position.column] = isValid;
+            if (OneMoveAtTime(1, 0, position)) matrix[position.line, position.column] = true;
 
             // Left Down
-            isValid = OneMoveAtTime(1, -1, position);
-            matrix[position.line, position.column] = isValid;
+            if (OneMoveAtTime(1, -1, position)) matrix[position.line, position.column] = true;
 
             // Left
-            isValid = OneMoveAtTime(0, -1, position);
-            matrix[position.line, position.column] = isValid;
+            if (OneMoveAtTime(0, -1, position)) matrix[position.line, position.column] = true;
 
             // Left Up
-            isValid = OneMoveAtTime(-1, -1, position);
-            matrix[position.line, position.column] = isValid;
+            if (OneMoveAtTime(-1, -1, position)) matrix[position.line, position.column] = true;
 
             return matrix;
         }

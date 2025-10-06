@@ -11,15 +11,24 @@ namespace Secao17.ChessGame
             Console.WriteLine();
             PrintCapturedPieces(chessMatch);
             Console.WriteLine();
-            Console.WriteLine($"Turn: {chessMatch.turn}");
-            Console.WriteLine($"Waiting player: {chessMatch.currentPlayer}");
+            Console.WriteLine($"Turn: {chessMatch.Turn}\n");
+            if (!chessMatch.Ended)
+            {
+                Console.WriteLine($"Waiting player: {chessMatch.CurrentPlayer}");
+                if (chessMatch.Check) Console.WriteLine($"CHECK");
+            }
+            else
+            {
+                Console.WriteLine("CHECKMATE!");
+                Console.WriteLine($"Winner: {chessMatch.CurrentPlayer}");
+            }
         }
         public static void PrintCapturedPieces(ChessMatch chessMatch)
         {
             Console.WriteLine($"Captured Pieces:\nWhite:");
-            PrintSet(chessMatch.capturedPieces(Color.White));
+            PrintSet(chessMatch.CapturedPieces(Color.White));
             Console.WriteLine("Black:");
-            InYellow(() => PrintSet(chessMatch.capturedPieces(Color.Black)));
+            InYellow(() => PrintSet(chessMatch.CapturedPieces(Color.Black)));
         }
         public static void PrintSet(HashSet<Piece> set)
         {

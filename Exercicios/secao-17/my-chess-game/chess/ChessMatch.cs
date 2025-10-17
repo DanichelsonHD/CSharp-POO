@@ -11,6 +11,7 @@ namespace Secao17.chess
         public bool Ended { get; private set; }
         private HashSet<Piece> pieces;
         private HashSet<Piece> captured;
+        public Piece LastPieceMoved { get; protected set; }
 
         public ChessMatch()
         {
@@ -27,22 +28,84 @@ namespace Secao17.chess
         public Piece ExecuteMove(Position origin, Position destiny)
         {
             Piece piece = board.RemovePiece(origin);
-            piece.AugmentMoveQuantity();
+            piece.AugmentmoveCount();
             Piece capturedPiece = board.RemovePiece(destiny);
             board.PlacePiece(piece, destiny);
             if (capturedPiece != null) captured.Add(capturedPiece);
+
+            // #specialMove Small Castling
+            if (piece is King && destiny.column == origin.column + 2)
+            {
+                Position rookOrigin = new Position(origin.line, origin.column + 3);
+                Position rookDestiny = new Position(origin.line, origin.column + 1);
+                Castling(rookOrigin, rookDestiny, false);
+            }
+
+            // #specialMove Big Castling
+            if (piece is King && destiny.column == origin.column - 2)
+            {
+                Position rookOrigin = new Position(origin.line, origin.column - 4);
+                Position rookDestiny = new Position(origin.line, origin.column - 1);
+                Castling(rookOrigin, rookDestiny, false);
+            }
+            
+            // #specialMove En Passant
+            if (piece is Pawn && destiny.column != origin.column && capturedPiece == null)
+            {
+                Position enemyPawn;
+                if (piece.color == Color.White) enemyPawn = new Position(destiny.line + 1, destiny.column);
+                else enemyPawn = new Position(destiny.line - 1, destiny.column);
+
+                capturedPiece = board.RemovePiece(enemyPawn);
+                captured.Add(capturedPiece);
+            }
+
             return capturedPiece;
         }
         public void UndoMove(Position origin, Position destiny, Piece capturedPiece)
         {
             Piece piece = board.RemovePiece(destiny);
-            piece.DecreaseMoveQuantity();
+            piece.DecreasemoveCount();
             if (capturedPiece != null)
             {
                 board.PlacePiece(capturedPiece, destiny);
                 captured.Remove(capturedPiece);
             }
             board.PlacePiece(piece, origin);
+
+            // #specialMove Small Castling
+            if (piece is King && destiny.column == origin.column + 2)
+            {
+                Position rookOrigin = new Position(origin.line, origin.column + 3);
+                Position rookDestiny = new Position(origin.line, origin.column + 1);
+                Castling(rookDestiny, rookOrigin, true);
+            }
+
+            // #specialMove Big Castling
+            if (piece is King && destiny.column == origin.column - 2)
+            {
+                Position rookOrigin = new Position(origin.line, origin.column - 4);
+                Position rookDestiny = new Position(origin.line, origin.column - 1);
+                Castling(rookDestiny, rookOrigin, true);
+            }
+
+            // #specialMove En Passant
+            if (piece is Pawn && destiny.column != origin.column && capturedPiece == null)
+            {
+                Piece pawn = board.RemovePiece(destiny);
+                Position pawnPosition;
+                if (piece.color == Color.White) pawnPosition = new Position(3, destiny.column);
+                else pawnPosition = new Position(4, destiny.column);
+
+                board.PlacePiece(pawn, origin);
+            }
+        }
+        private void Castling(Position origin, Position destiny, bool UndoCastling)
+        {
+            Piece rook = board.RemovePiece(origin);
+            if (UndoCastling) rook.DecreasemoveCount();
+            else rook.AugmentmoveCount();
+            board.PlacePiece(rook, destiny);
         }
         public void PlayMove(Position origin, Position destiny)
         {
@@ -56,12 +119,14 @@ namespace Secao17.chess
             if (IsInCheck(adversary(CurrentPlayer))) Check = true;
             else Check = false;
 
-            if (TestCheckmate(adversary(CurrentPlayer))) {  Ended = true; Console.WriteLine($"Ended"); }
+            if (TestCheckmate(adversary(CurrentPlayer))) { Ended = true; Console.WriteLine($"Ended"); }
             else
             {
                 Turn++;
                 changePlayer();
             }
+
+            LastPieceMoved = board.Piece(destiny);
         }
         public void ValidateOriginPosition(Position origin)
         {
@@ -133,26 +198,26 @@ namespace Secao17.chess
             PlaceNewPiece("b1", new Knight(board, Color.White));
             PlaceNewPiece("c1", new Bishop(board, Color.White));
             PlaceNewPiece("d1", new Queen(board, Color.White));
-            PlaceNewPiece("e1", new King(board, Color.White));
+            PlaceNewPiece("e1", new King(board, Color.White, this));
             PlaceNewPiece("f1", new Bishop(board, Color.White));
             PlaceNewPiece("g1", new Knight(board, Color.White));
             PlaceNewPiece("h1", new Rook(board, Color.White));
 
             //White Pawns
-            for (int i = 0; i < board.columns; i++) PlaceNewPiece($"{(char)('a' + i)}2", new Pawn(board, Color.White));
+            for (int i = 0; i < board.columns; i++) PlaceNewPiece($"{(char)('a' + i)}2", new Pawn(board, Color.White, this));
 
             //Black Pieces
             PlaceNewPiece("a8", new Rook(board, Color.Black));
             PlaceNewPiece("b8", new Knight(board, Color.Black));
             PlaceNewPiece("c8", new Bishop(board, Color.Black));
             PlaceNewPiece("d8", new Queen(board, Color.Black));
-            PlaceNewPiece("e8", new King(board, Color.Black));
+            PlaceNewPiece("e8", new King(board, Color.Black, this));
             PlaceNewPiece("f8", new Bishop(board, Color.Black));
             PlaceNewPiece("g8", new Knight(board, Color.Black));
             PlaceNewPiece("h8", new Rook(board, Color.Black));
 
             //Black Pawns
-            for (int i = 0; i < board.columns; i++) PlaceNewPiece($"{(char)('a' + i)}7", new Pawn(board, Color.Black));
+            for (int i = 0; i < board.columns; i++) PlaceNewPiece($"{(char)('a' + i)}7", new Pawn(board, Color.Black, this));
         }
     }
 }

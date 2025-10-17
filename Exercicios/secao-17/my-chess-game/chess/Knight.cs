@@ -9,30 +9,15 @@ namespace Secao17.chess
         public override bool[,] ValidMoves()
         {
             bool[,] matrix = new bool[board.lines, board.columns];
+            List<int[]> moves = new List<int[]> {
+                { [ 1,  2] }, { [ 2,  1] },
+                { [-1,  2] }, { [-2,  1] },
+                { [ 1, -2] }, { [ 2, -1] },
+                { [-1, -2] }, { [-2, -1] }
+            };
             Position position = new Position(0, 0);
-            bool isValid;
 
-            // Right Down
-            if (OneMoveAtTime(1, 2, position)) matrix[position.line, position.column] = true;
-
-            if (OneMoveAtTime(2, 1, position)) matrix[position.line, position.column] = true;
-
-            // Right Up
-            if (OneMoveAtTime(-1, 2, position)) matrix[position.line, position.column] = true;
-
-            if (OneMoveAtTime(-2, 1, position)) matrix[position.line, position.column] = true;
-
-            // Left Down
-            if (OneMoveAtTime(1, -2, position)) matrix[position.line, position.column] = true;
-
-            if (OneMoveAtTime(2, -1, position)) matrix[position.line, position.column] = true;
-
-            // Left Up
-            if (OneMoveAtTime(-1, -2, position)) matrix[position.line, position.column] = true;
-
-            if (OneMoveAtTime(-2, -1, position)) matrix[position.line, position.column] = true;
-
-            return matrix;
+            return SingleMoves(moves, position, matrix);
         }
         public override string ToString()
         {

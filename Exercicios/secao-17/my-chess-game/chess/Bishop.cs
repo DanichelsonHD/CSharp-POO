@@ -9,21 +9,13 @@ namespace Secao17.chess
         public override bool[,] ValidMoves()
         {
             bool[,] matrix = new bool[board.lines, board.columns];
+            List<int[]> moves = new List<int[]> {
+                { [-1,  1] }, { [ 1,  1] },
+                { [ 1, -1] }, { [-1, -1] }
+            };
             Position position = new Position(0, 0);
 
-            // Left Up
-            matrix = SequentialMoves(-1, 1, position, matrix);
-
-            // Right Up
-            matrix = SequentialMoves(1, 1, position, matrix);
-
-            // Right Down
-            matrix = SequentialMoves(1, -1, position, matrix);
-
-            // Left Down
-            matrix = SequentialMoves(-1, -1, position, matrix);
-
-            return matrix;
+            return LineMoves(moves, position, matrix);
         }
         public override string ToString()
         {

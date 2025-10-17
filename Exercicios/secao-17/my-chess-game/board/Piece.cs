@@ -1,18 +1,21 @@
+using Secao17.chess;
+
 namespace Secao17.board
 {
     abstract class Piece
     {
         public Position position { get; set; }
         public Color color { get; protected set; }
-        public int moveQuantity { get; protected set; }
+        public int moveCount { get; protected set; }
         public Board board { get; protected set; }
+        public ChessMatch chessMatch { get; protected set; }
 
         public Piece(Board board, Color color)
         {
             this.position = null;
             this.color = color;
             this.board = board;
-            moveQuantity = 0;
+            moveCount = 0;
         }
         protected bool CanMove(Position position)
         {
@@ -20,6 +23,21 @@ namespace Secao17.board
             Piece piece = board.Piece(position);
             return piece == null || piece.color != color;
         }
+        public void AugmentmoveCount() => moveCount++;
+        public void DecreasemoveCount() => moveCount--;
+        public bool existValidMoves()
+        {
+            bool[,] mat = ValidMoves();
+            for (int i = 0; i < board.lines; i++)
+                for (int j = 0; j < board.columns; j++)
+                    if (mat[i, j]) return true;
+            return false;
+        }
+        public bool possibleMove(Position position)
+        {
+            return ValidMoves()[position.line, position.column];
+        }
+        public abstract bool[,] ValidMoves();
         protected bool OneMoveAtTime(int lineModifier, int columnModifier, Position position)
         {
             if (!board.IsPositionValid(new Position(this.position.line + lineModifier, this.position.column + columnModifier))) return false;
@@ -41,20 +59,20 @@ namespace Secao17.board
             }
             return matrix;
         }
-        public void AugmentMoveQuantity() => moveQuantity++;
-        public void DecreaseMoveQuantity() => moveQuantity--;
-        public bool existValidMoves()
+        protected bool[,] LineMoves(List<int[]> moves, Position position, bool[,] matrix)
         {
-            bool[,] mat = ValidMoves();
-            for (int i = 0; i < board.lines; i++)
-                for (int j = 0; j < board.columns; j++)
-                    if (mat[i, j]) return true;
-            return false;
+            foreach (var move in moves)
+                matrix = SequentialMoves(move[0], move[1], position, matrix);
+
+            return matrix;
         }
-        public bool possibleMove(Position position)
+        protected bool[,] SingleMoves(List<int[]> moves, Position position, bool[,] matrix)
         {
-            return ValidMoves()[position.line, position.column];
+            foreach (var move in moves)
+                if (OneMoveAtTime(move[0], move[1], position))
+                    matrix[position.line, position.column] = true;
+
+            return matrix;
         }
-        public abstract bool[,] ValidMoves();
     }
 }

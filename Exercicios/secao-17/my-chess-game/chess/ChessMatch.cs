@@ -12,6 +12,8 @@ namespace Secao17.chess
         private HashSet<Piece> pieces;
         private HashSet<Piece> captured;
         public Piece LastPieceMoved { get; protected set; }
+        public delegate string PromotionHandler(Color color);
+        public PromotionHandler OnPromotion { get; set; }
 
         public ChessMatch()
         {
@@ -116,6 +118,33 @@ namespace Secao17.chess
                 UndoMove(origin, destiny, capturedPiece);
                 throw new BoardException("You can't put yourself in check");
             }
+
+            Piece piece = board.Piece(destiny);
+
+            // #specialMove Promotion
+            if (piece is Pawn) {
+                bool promotionRow = (piece.color == Color.White && destiny.line == 0) || (piece.color == Color.Black && destiny.line == 7);
+                if (promotionRow)
+                {
+                    
+                    piece = board.RemovePiece(destiny);
+                    pieces.Remove(piece);
+
+                    string choice = OnPromotion?.Invoke(piece.color) ?? "Q";
+
+                    Piece newPiece = choice.ToUpper() switch
+                    {
+                        "B" => new Bishop(board, piece.color),
+                        "N" => new Knight(board, piece.color),
+                        "R" => new Rook(board, piece.color),
+                        _ => new Queen(board, piece.color)
+                    };
+                    
+                    board.PlacePiece(newPiece, destiny);
+                    pieces.Add(newPiece);
+                }
+            }
+
             if (IsInCheck(adversary(CurrentPlayer))) Check = true;
             else Check = false;
 
@@ -193,7 +222,7 @@ namespace Secao17.chess
         }
         public void PlaceInitialPieces()
         {
-            //White Pieces
+            //White Pieces 
             PlaceNewPiece("a1", new Rook(board, Color.White));
             PlaceNewPiece("b1", new Knight(board, Color.White));
             PlaceNewPiece("c1", new Bishop(board, Color.White));

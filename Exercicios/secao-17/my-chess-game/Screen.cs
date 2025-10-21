@@ -5,6 +5,20 @@ namespace Secao17.ChessGame
 {
     class Screen
     {
+        public static void ChoosePromotionPiece(ChessMatch chessMatch)
+        {
+            chessMatch.OnPromotion = (Color color) =>
+            {
+                Console.WriteLine($"\nPromotion");
+                Console.Write("Choose piece (Q=Queen, R=Rook, B=Bishop, N=Knight): ");
+                string input = Console.ReadLine()?.Trim().ToUpper();
+
+                if (input != "Q" && input != "R" && input != "B" && input != "N")
+                    input = "Q";
+
+                return input;
+            };
+        }
         public static void PrintMatch(ChessMatch chessMatch)
         {
             PrintBoard(chessMatch.board);

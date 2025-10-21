@@ -8,6 +8,7 @@ namespace Secao17.ChessGame
         static void Main(string[] args)
         {
             ChessMatch chessMatch = new ChessMatch();
+            Screen.ChoosePromotionPiece(chessMatch);
 
             while (!chessMatch.Ended)
             {
